@@ -29,26 +29,15 @@ namespace ChatFirst.Hack.Standups.Services
             return users;
         }
 
-        private Task<List<ChatRoomUser>> GetUsersAsync(string url)
+        private async Task<List<ChatRoomUser>> GetUsersAsync(string url)
         {
-            return Task.Run(() =>
-            {
-                var t = new TaskCompletionSource<List<ChatRoomUser>>();
+            var restClient = new RestClient(url);
+            var req = new RestRequest("", Method.GET);
+            var response = await restClient.ExecuteTaskAsync<List<ChatRoomUser>>(req);
 
-                var restClient = new RestClient(url);
-                var req = new RestRequest("", Method.GET);
-                restClient.ExecuteAsync(req, response => {
-                    Trace.TraceInformation("[ChatRoomUserService.GetUsers] response: " + response.Content);
-                    t.TrySetResult(JsonConvert.DeserializeObject<List<ChatRoomUser>>(response.Content));
-                });
+            Trace.TraceInformation("[ChatRoomUserService.GetUsers] response: " + response.Content);
 
-                return t.Task;
-            });
+            return response.Data;
         }
-    }    
-
-    public interface IChatRoomUserService
-    {
-        Task<List<ChatRoomUser>> GetUsersAsync(string roomId, string botName);
     }
 }

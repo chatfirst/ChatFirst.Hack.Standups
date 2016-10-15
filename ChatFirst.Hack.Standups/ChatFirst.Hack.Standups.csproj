@@ -160,6 +160,8 @@
     <Compile Include="Services\ChatRoomUserService.cs" />
     <Compile Include="Services\ConfigService.cs" />
     <Compile Include="Services\DalService.cs" />
+    <Compile Include="Services\IChatRoomUserService.cs" />
+    <Compile Include="Services\IMeetingService.cs" />
     <Compile Include="Services\MeetingService.cs" />
   </ItemGroup>
   <ItemGroup>
