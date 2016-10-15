@@ -55,6 +55,33 @@ namespace ChatFirst.Hack.Standups.Services
             }
         }
 
+        public Task PushEndOfMeetingAsync(string botName, string roomId, string userId)
+        {
+            var urlService = string.Format(ConfigService.Get(Constants.UrlPushUserChatBot), botName, roomId + "-" + userId);
+            var message = ConfigService.Get(Constants.TemplateMessage3);
+
+            return Task.Run(() =>
+            {
+                var t = new TaskCompletionSource<object>();
+
+                var restClient = new RestClient(urlService);
+                restClient.Authenticator = new HttpBasicAuthenticator(ConfigService.Get(Constants.UserToken), string.Empty);
+                var req = new RestRequest("", Method.POST);
+                req.AddJsonBody(new PushAnswerDataStruct
+                {
+                    Count = 1,
+                    ForcedState = string.Empty,
+                    Messages = new List<string> { message }
+                });
+                restClient.ExecuteAsync(req, response => {
+                    Trace.TraceInformation("[MeetingService.PushEndOfMeeting] response: " + response.Content);
+                    t.TrySetResult(null);
+                });
+
+                return t.Task;
+            });
+        }
+
         private Task PushRemoteChatService(string url, Answer answer)
         {
             //0 - userId, 1 - userName
