@@ -8,25 +8,16 @@ using System.Web.Security;
 using System.Web.SessionState;
 using System.Web.Http;
 
-
 namespace ChatFirst.Hack.Standups
 {
-    using Hangfire;
-    using Services;
-
     public class Global : HttpApplication
     {
         void Application_Start(object sender, EventArgs e)
         {
-            // Код, выполняемый при запуске приложения
+            // Code that runs on application startup
             AreaRegistration.RegisterAllAreas();
-            System.Web.Http.GlobalConfiguration.Configure(WebApiConfig.Register);
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
-
-            GlobalConfiguration
-                .Configuration
-                .UseSqlServerStorage(ConfigService.Get(Constants.DbConnectionKey));
-            
+            GlobalConfiguration.Configure(WebApiConfig.Register);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);            
         }
     }
 }
