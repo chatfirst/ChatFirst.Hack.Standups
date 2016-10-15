@@ -15,9 +15,12 @@ namespace ChatFirst.Hack.Standups.Repository.Implementations
 
         public RoomRepository(string connStr) : base(connStr) { }
 
-        public Task<IEnumerable<ViewRoom>> RoomAddRangeAsync(IEnumerable<ViewRoom> rooms)
+        public async Task<IEnumerable<ViewRoom>> RoomAddRangeAsync(IEnumerable<ViewRoom> rooms)
         {
-            throw new NotImplementedException();
+            using(var db = this.GetContext())
+            {
+                return null;
+            }
         }
 
         public Task<IEnumerable<ViewRoom>> RoomDeleteRangeByIdsAsync(IEnumerable<long> rooms)
