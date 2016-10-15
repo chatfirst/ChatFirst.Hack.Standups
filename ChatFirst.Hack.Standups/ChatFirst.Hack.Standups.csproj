@@ -104,6 +104,10 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net452\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Swashbuckle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cd1bb07a5ac7c7bc, processorArchitecture=MSIL">
       <HintPath>..\packages\Swashbuckle.Core.5.4.0\lib\net40\Swashbuckle.Core.dll</HintPath>
       <Private>True</Private>
@@ -182,6 +186,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Controllers\MeetingsController.cs" />
     <Compile Include="Controllers\RoomsController.cs" />
+    <Compile Include="Extensions\ExceptionsEx.cs" />
     <Compile Include="Extensions\ViewModels.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -212,6 +217,7 @@
     <Compile Include="Repository\Implementations\BaseRepository.cs" />
     <Compile Include="Repository\Implementations\MeetingRepository.cs" />
     <Compile Include="Repository\Implementations\RoomRepository.cs" />
+    <Compile Include="Services\ChatRoomUserService.cs" />
     <Compile Include="Services\ConfigService.cs" />
     <Compile Include="Services\DalService.cs" />
   </ItemGroup>

@@ -9,5 +9,6 @@ namespace ChatFirst.Hack.Standups
     {
         public const string DbConnectionKey = "dbconnection";
         public const string UserToken = "usertoken";
+        public const string UrlApiGetChatRoomUsers = "urlChatRoomUsersGet";
     }
 }

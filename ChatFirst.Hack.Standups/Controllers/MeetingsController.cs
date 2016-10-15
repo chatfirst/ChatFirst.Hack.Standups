@@ -9,110 +9,124 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
 using ChatFirst.Hack.Standups.Models;
+using System.Threading.Tasks;
 
 namespace ChatFirst.Hack.Standups.Controllers
 {
+    using Services;
+    using Extensions;
+
     public class MeetingsController : ApiController
     {
         private HackDbContext db = new HackDbContext();
 
-        // GET: api/Meetings
-        public IQueryable<Meeting> GetMeetings()
+        // GET: api/Meetings/1
+        public async Task<IHttpActionResult> GetMeetings(long roomId)
         {
-            return db.Meetings;
-        }
-
-        // GET: api/Meetings/5
-        [ResponseType(typeof(Meeting))]
-        public IHttpActionResult GetMeeting(long id)
-        {
-            Meeting meeting = db.Meetings.Find(id);
-            if (meeting == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(meeting);
-        }
-
-        // PUT: api/Meetings/5
-        [ResponseType(typeof(void))]
-        public IHttpActionResult PutMeeting(long id, Meeting meeting)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != meeting.Id)
-            {
-                return BadRequest();
-            }
-
-            db.Entry(meeting).State = EntityState.Modified;
-
             try
             {
-                db.SaveChanges();
+                var room = await this.db.Rooms.FirstOrDefaultAsync(r => r.Id == roomId);
+                var userService = new ChatRoomUserService();
+                var users = await userService.GetUsersAsync(room.RoomId, room.BotName);
+                return Ok(users);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!MeetingExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return Ok(ex.GetInnerBottomException().ToString());
             }
-
-            return StatusCode(HttpStatusCode.NoContent);
         }
 
-        // POST: api/Meetings
-        [ResponseType(typeof(Meeting))]
-        public IHttpActionResult PostMeeting(Meeting meeting)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //// GET: api/Meetings/5
+        //[ResponseType(typeof(Meeting))]
+        //public IHttpActionResult GetMeeting(long id)
+        //{
+        //    Meeting meeting = db.Meetings.Find(id);
+        //    if (meeting == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            db.Meetings.Add(meeting);
-            db.SaveChanges();
+        //    return Ok(meeting);
+        //}
 
-            return CreatedAtRoute("DefaultApi", new { id = meeting.Id }, meeting);
-        }
+        //// PUT: api/Meetings/5
+        //[ResponseType(typeof(void))]
+        //public IHttpActionResult PutMeeting(long id, Meeting meeting)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-        // DELETE: api/Meetings/5
-        [ResponseType(typeof(Meeting))]
-        public IHttpActionResult DeleteMeeting(long id)
-        {
-            Meeting meeting = db.Meetings.Find(id);
-            if (meeting == null)
-            {
-                return NotFound();
-            }
+        //    if (id != meeting.Id)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            db.Meetings.Remove(meeting);
-            db.SaveChanges();
+        //    db.Entry(meeting).State = EntityState.Modified;
 
-            return Ok(meeting);
-        }
+        //    try
+        //    {
+        //        db.SaveChanges();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!MeetingExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        //    return StatusCode(HttpStatusCode.NoContent);
+        //}
 
-        private bool MeetingExists(long id)
-        {
-            return db.Meetings.Count(e => e.Id == id) > 0;
-        }
+        //// POST: api/Meetings
+        //[ResponseType(typeof(Meeting))]
+        //public IHttpActionResult PostMeeting(Meeting meeting)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+
+        //    db.Meetings.Add(meeting);
+        //    db.SaveChanges();
+
+        //    return CreatedAtRoute("DefaultApi", new { id = meeting.Id }, meeting);
+        //}
+
+        //// DELETE: api/Meetings/5
+        //[ResponseType(typeof(Meeting))]
+        //public IHttpActionResult DeleteMeeting(long id)
+        //{
+        //    Meeting meeting = db.Meetings.Find(id);
+        //    if (meeting == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    db.Meetings.Remove(meeting);
+        //    db.SaveChanges();
+
+        //    return Ok(meeting);
+        //}
+
+        //protected override void Dispose(bool disposing)
+        //{
+        //    if (disposing)
+        //    {
+        //        db.Dispose();
+        //    }
+        //    base.Dispose(disposing);
+        //}
+
+        //private bool MeetingExists(long id)
+        //{
+        //    return db.Meetings.Count(e => e.Id == id) > 0;
+        //}
     }
 }
