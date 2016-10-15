@@ -179,6 +179,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -205,6 +206,7 @@
     <Compile Include="Repository\Implementations\MeetingRepository.cs" />
     <Compile Include="Repository\Implementations\RoomRepository.cs" />
     <Compile Include="Services\ConfigService.cs" />
+    <Compile Include="Services\DalService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config" />

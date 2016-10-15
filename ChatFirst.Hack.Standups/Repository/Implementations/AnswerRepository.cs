@@ -11,6 +11,10 @@ namespace ChatFirst.Hack.Standups.Repository.Implementations
 
     public class AnswerRepository : BaseRepository, IAnswerRepository
     {
+        public AnswerRepository() { }
+
+        public AnswerRepository(string connStr) : base(connStr) { }
+
         public Task<IEnumerable<ViewAnswer>> AnswerAddRangeAsync(IEnumerable<ViewAnswer> answears)
         {
             throw new NotImplementedException();

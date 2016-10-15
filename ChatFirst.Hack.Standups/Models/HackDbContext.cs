@@ -10,7 +10,7 @@ namespace ChatFirst.Hack.Standups.Models
 
     public class HackDbContext : DbContext
     {
-        public HackDbContext() : this(ConfigService.Get("dbconnection")) { }
+        public HackDbContext() : this(ConfigService.Get(Constants.DbConnectionKey) ?? "local") { }
         public HackDbContext(string nameConnection): base(nameConnection) { }
 
         public DbSet<Room> Rooms { get; set; }

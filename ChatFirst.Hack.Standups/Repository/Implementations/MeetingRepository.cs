@@ -11,6 +11,10 @@ namespace ChatFirst.Hack.Standups.Repository.Implementations
 
     public class MeetingRepository : BaseRepository, IMeetingRepository
     {
+        public MeetingRepository() { }
+
+        public MeetingRepository(string connStr) : base(connStr) { }
+
         public Task<IEnumerable<ViewMeeting>> MeetingAddRangeAsync(IEnumerable<ViewMeeting> meets)
         {
             throw new NotImplementedException();

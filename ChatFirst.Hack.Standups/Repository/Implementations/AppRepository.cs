@@ -32,6 +32,13 @@ namespace ChatFirst.Hack.Standups.Repository.Implementations
                 new MeetingRepository()
             ) { }
 
+        public AppRepository(string connStr) : this(
+                new AnswerRepository(connStr),
+                new RoomRepository(connStr),
+                new MeetingRepository(connStr)
+            )
+        { }
+
         public Task<IEnumerable<ViewAnswer>> AnswerAddRangeAsync(IEnumerable<ViewAnswer> answears)
         {
             throw new NotImplementedException();

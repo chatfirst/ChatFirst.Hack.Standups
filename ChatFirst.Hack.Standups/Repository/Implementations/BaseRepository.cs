@@ -9,6 +9,7 @@ namespace ChatFirst.Hack.Standups.Repository.Implementations
 
     public class BaseRepository
     {
+        protected string ConnectionString { get; private set; }
         protected HackDbContext GetContext(string connStringName)
         {
             return new HackDbContext(connStringName);
@@ -16,7 +17,14 @@ namespace ChatFirst.Hack.Standups.Repository.Implementations
 
         protected HackDbContext GetContext()
         {
-            return new HackDbContext();
+            return this.ConnectionString == null ? new HackDbContext() : new HackDbContext(this.ConnectionString);
+        }
+
+        public BaseRepository() { }
+
+        public BaseRepository(string connString)
+        {
+            this.ConnectionString = connString;
         }
     }
 }

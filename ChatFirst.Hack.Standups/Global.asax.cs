@@ -25,7 +25,7 @@ namespace ChatFirst.Hack.Standups
 
             GlobalConfiguration
                 .Configuration
-                .UseSqlServerStorage(ConfigService.Get("dbconnection"));
+                .UseSqlServerStorage(ConfigService.Get(Constants.DbConnectionKey));
             
         }
     }
