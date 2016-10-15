@@ -15,6 +15,7 @@ namespace ChatFirst.Hack.Standups.Controllers
 {
     using Services;
     using Extensions;
+    using System.Diagnostics;
 
     public class MeetingsController : ApiController
     {
@@ -25,13 +26,15 @@ namespace ChatFirst.Hack.Standups.Controllers
         {
             try
             {
+                Trace.TraceInformation("[MeetingsController.GetMeetings] roomId=" + roomId);
                 var meetService = new MeetingService();
                 await meetService.StartMeetingAsync(roomId);
                 return Ok("start meeting");
             }
             catch (Exception ex)
             {
-                return Ok(ex.GetInnerBottomException().ToString());
+                Trace.TraceError(ex.GetInnerBottomException().ToString());
+                return Ok(ex.GetInnerBottomException().Message);
             }
         }
 
