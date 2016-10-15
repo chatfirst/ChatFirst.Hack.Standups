@@ -25,10 +25,9 @@ namespace ChatFirst.Hack.Standups.Controllers
         {
             try
             {
-                var room = await this.db.Rooms.FirstOrDefaultAsync(r => r.Id == roomId);
-                var userService = new ChatRoomUserService();
-                var users = await userService.GetUsersAsync(room.RoomId, room.BotName);
-                return Ok(users);
+                var meetService = new MeetingService();
+                await meetService.StartMeetingAsync(roomId);
+                return Ok("start meeting");
             }
             catch (Exception ex)
             {

@@ -9,6 +9,7 @@ namespace ChatFirst.Hack.Standups.Services
     using RestSharp;
     using System.Threading.Tasks;
     using Newtonsoft.Json;
+    using Models;
 
     public class ChatRoomUserService : IChatRoomUserService
     {
@@ -44,13 +45,7 @@ namespace ChatFirst.Hack.Standups.Services
                 return t.Task;
             });
         }
-    }
-
-    public class ChatRoomUser
-    {
-        public string userId { get; set; }
-        public string userName { get; set; }
-    }
+    }    
 
     public interface IChatRoomUserService
     {
