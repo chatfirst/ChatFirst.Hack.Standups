@@ -11,6 +11,8 @@ namespace ChatFirst.Hack.Standups.Models
         [Key]
         public long Id { get; set; }
 
+        public string BotName { get; set; }
+
         /// <summary>
         /// Идентификатор комнаты в CS
         /// </summary>

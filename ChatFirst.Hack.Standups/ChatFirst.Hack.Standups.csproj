@@ -180,6 +180,8 @@
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Controllers\MeetingsController.cs" />
+    <Compile Include="Controllers\RoomsController.cs" />
     <Compile Include="Extensions\ViewModels.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -187,6 +189,10 @@
     <Compile Include="Migrations\201610151206221_0.1.0.cs" />
     <Compile Include="Migrations\201610151206221_0.1.0.Designer.cs">
       <DependentUpon>201610151206221_0.1.0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610151516413_0.1.1.cs" />
+    <Compile Include="Migrations\201610151516413_0.1.1.Designer.cs">
+      <DependentUpon>201610151516413_0.1.1.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Answer.cs" />
@@ -222,12 +228,13 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201610151206221_0.1.0.resx">
       <DependentUpon>201610151206221_0.1.0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610151516413_0.1.1.resx">
+      <DependentUpon>201610151516413_0.1.1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

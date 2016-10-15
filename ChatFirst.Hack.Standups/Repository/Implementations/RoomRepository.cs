@@ -8,6 +8,7 @@ namespace ChatFirst.Hack.Standups.Repository.Implementations
     using ModelViews;
     using Contract;
     using System.Threading.Tasks;
+    using Extensions;
 
     public class RoomRepository : BaseRepository, IRoomRepository
     {
@@ -17,15 +18,37 @@ namespace ChatFirst.Hack.Standups.Repository.Implementations
 
         public async Task<IEnumerable<ViewRoom>> RoomAddRangeAsync(IEnumerable<ViewRoom> rooms)
         {
+            if (rooms == null || !rooms.Any())
+                return new List<ViewRoom>();
             using(var db = this.GetContext())
             {
-                return null;
+                var models = rooms.Select(i => i.ViewRoomToModel());
+                var dm = db.Rooms.AddRange(models);
+                await db.SaveChangesAsync();
+                return dm.Select(i => i.RoomToView());
             }
         }
 
-        public Task<IEnumerable<ViewRoom>> RoomDeleteRangeByIdsAsync(IEnumerable<long> rooms)
+        public async Task<IEnumerable<ViewRoom>> RoomDeleteRangeByIdsAsync(IEnumerable<long> rooms)
         {
+            if (rooms == null || !rooms.Any())
+                return new List<ViewRoom>();
             throw new NotImplementedException();
+            //using (var db = this.GetContext())
+            //{
+            //    using (var trans = db.Database.BeginTransaction())
+            //    {
+            //        try
+            //        {
+                        
+            //        }
+            //        catch
+            //        {
+            //            trans.Rollback();
+            //            throw;
+            //        }
+            //    }
+            //}
         }
 
         public Task<IEnumerable<ViewRoom>> RoomGetAllAsync()
