@@ -52,11 +52,11 @@ namespace ChatFirst.Hack.Standups.Services
                 var room = await db.Rooms.FirstOrDefaultAsync(r => r.Id == roomId);
 
                 if (room == null)
-                    throw new ApplicationException("Не существует roomId=" + roomId);
+                    throw new ApplicationException("not found roomId=" + roomId);
                 var meetExist =
                     await db.Meetings.FirstOrDefaultAsync(m => m.RoomId == roomId && m.DateEnd == null);
                 if (meetExist != null)
-                    throw new ApplicationException("Митинг уже запущен в roomId=" + roomId);
+                    throw new ApplicationException("meet not exist in roomId=" + roomId);
                 return room;
             }
         }
@@ -69,6 +69,29 @@ namespace ChatFirst.Hack.Standups.Services
                     .Where(a => a.MeetingId == meetId && a.Ans1 == null && a.Ans2 == null && a.Ans3 == null)
                     .OrderBy(a => a.Id)
                     .FirstOrDefaultAsync();
+            }
+        }
+
+        public async Task<Meeting> UpdateMeeting(long meetId, Meeting meet)
+        {
+            using (var db = new HackDbContext(ConfigService.Get(Constants.DbConnectionKey)))
+            {
+                var dbMeet = await db.Meetings.FirstOrDefaultAsync(m => m.Id == meetId);
+                if (dbMeet == null)
+                    return null;
+                dbMeet.DateEnd = meet.DateEnd;
+                dbMeet.DateStart = meet.DateStart;
+                db.Entry(dbMeet).State = EntityState.Modified;
+                await db.SaveChangesAsync();
+                return dbMeet;
+            }
+        }
+
+        public async Task<IEnumerable<Meeting>> GetOpenMeetingsByRoomId(long roomId)
+        {
+            using (var db = new HackDbContext(ConfigService.Get(Constants.DbConnectionKey)))
+            {
+                return await db.Meetings.Where(m => m.RoomId == roomId && m.DateEnd == null).ToListAsync();
             }
         }
     }

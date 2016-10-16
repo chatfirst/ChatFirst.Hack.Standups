@@ -20,6 +20,47 @@ namespace ChatFirst.Hack.Standups.Controllers
     public class MeetingsController : ApiController
     {
         private HackDbContext db = new HackDbContext();
+        private readonly IRoomRepository _roomRepo = new RoomRepository();
+        private readonly IMeetingService _meetingService = new MeetingService();
+
+        [Route("api/start")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetStart(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return BadRequest();
+            var s = id.Split('-');
+            if (s.Length != 2)
+                return BadRequest();
+
+            var roomId = s[0];
+            var userId = s[1];
+
+            try
+            {
+                Trace.TraceInformation("[MeetingsController.GetStart] roomId=" + roomId);
+                var room = await _roomRepo.GetRoomBySparkRoomID(roomId);
+                if (room == null)
+                    throw new ApplicationException("Can't start meeting for this room. Room is not found!");
+                await _meetingService.StartMeetingAsync(room.Id);
+                return Ok(new ExternalMessage { Count = 0, Messages = new List<string>() });
+            }
+            catch (Exception ex)
+            {
+                var e = ex.GetInnerBottomException();
+                Trace.TraceError(e.ToString());
+                return ResponseMessage(Request.CreateResponse(
+                    HttpStatusCode.InternalServerError,
+                    new ExternalMessage
+                    {
+                        Count = 1,
+                        ForcedState = string.Empty,
+                        //todo: set friendly messages
+                        Messages = new List<string> { e.Message }
+                    }
+                ));
+            }
+        }
 
         // GET: api/Meetings/1
         public async Task<IHttpActionResult> GetMeetings(long roomId)

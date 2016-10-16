@@ -9,5 +9,7 @@ namespace ChatFirst.Hack.Standups.Services
         Task<Answer> GetNextMeetingPushAsync(long meetId);
         Task<Room> FindRoom(long roomId);
         Task<Meeting> SaveMeeting(Room room, IEnumerable<ChatRoomUser> users);
+        Task<IEnumerable<Meeting>> GetOpenMeetingsByRoomId(long roomId);
+        Task<Meeting> UpdateMeeting(long meetId, Meeting meet);
     }
 }

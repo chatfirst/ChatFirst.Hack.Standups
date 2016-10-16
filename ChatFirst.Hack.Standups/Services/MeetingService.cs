@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using ChatFirst.Hack.Standups.Models;
 using RestSharp;
 using RestSharp.Authenticators;
+using System.Linq;
 
 namespace ChatFirst.Hack.Standups.Services
 {
@@ -51,6 +53,22 @@ namespace ChatFirst.Hack.Standups.Services
             var users = await _userService.GetUsersAsync(room.RoomId, room.BotName);
             var meet = await _metingAnswersRepository.SaveMeeting(room, users);
             return meet.Id;
+        }
+
+        public async Task DismissMeetingAsync(string sparkRoomId)
+        {
+            var room = await _roomRepository.GetRoomBySparkRoomID(sparkRoomId);
+            if (room == null)
+                throw new ApplicationException("room not found");
+            var meets = await _metingAnswersRepository.GetOpenMeetingsByRoomId(room.Id);
+            if (!meets.Any())
+                return;
+            //close all : set DateEnd
+            foreach (var meet in meets)
+            {
+                meet.DateEnd = DateTime.Now;
+                await _metingAnswersRepository.UpdateMeeting(meet.Id, meet);
+            }
         }
     }
 }
