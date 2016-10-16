@@ -16,6 +16,8 @@ namespace ChatFirst.Hack.Standups.Controllers
 
     public class AnswerbackController : ApiController
     {
+        private IConnectorClient _connectorClient = new ConnectorClient();
+
         [Route("api/answerback/{qnum}")]
         public async Task<IHttpActionResult> Get(int qnum, string id, string msg)
         {
@@ -34,13 +36,13 @@ namespace ChatFirst.Hack.Standups.Controllers
                 {
                     try
                     {
-                        var _room = await db.Rooms.FirstOrDefaultAsync(r => r.RoomId == roomId);
-                        if (_room == null)
+                        var room = await db.Rooms.FirstOrDefaultAsync(r => r.RoomId == roomId);
+                        if (room == null)
                             return BadRequest($"roomId={roomId} not found");
-                        var _meet = await db.Meetings.FirstOrDefaultAsync(m => m.RoomId == _room.Id && m.DateEnd == null);
-                        if (_meet == null)
+                        var meet = await db.Meetings.FirstOrDefaultAsync(m => m.RoomId == room.Id && m.DateEnd == null);
+                        if (meet == null)
                             return BadRequest($"open meeting not found in roomId={roomId}");
-                        var answer = await db.Answers.FirstOrDefaultAsync(a => a.MeetingId == _meet.Id && a.UserId == userId);
+                        var answer = await db.Answers.FirstOrDefaultAsync(a => a.MeetingId == meet.Id && a.UserId == userId);
                         if (answer == null)
                             return BadRequest($"userId={userId} not found in roomId={roomId}");
                         switch (qnum)
@@ -59,6 +61,8 @@ namespace ChatFirst.Hack.Standups.Controllers
                         }
                         db.Entry(answer).State = EntityState.Modified;
                         await db.SaveChangesAsync();
+
+
                         if (string.IsNullOrEmpty(answer.Ans1)
                             || string.IsNullOrEmpty(answer.Ans2)
                             || string.IsNullOrEmpty(answer.Ans3))
@@ -66,20 +70,22 @@ namespace ChatFirst.Hack.Standups.Controllers
                             return Ok();
                         //init next push or end meeting
                         var meetSrv = new MeetingService();
-                        var nextAnswer = await meetSrv.GetNexMeetingPushAsync(_meet.Id);
+                        var nextAnswer = await meetSrv.GetNextMeetingPushAsync(meet.Id);
                         if (nextAnswer == null)
                         {
                             // end meeting
                             //set endtime
-                            _meet.DateEnd = DateTime.Now;
-                            db.Entry(_meet).State = EntityState.Modified;
+                            meet.DateEnd = DateTime.Now;
+                            db.Entry(meet).State = EntityState.Modified;
                             await db.SaveChangesAsync();
                             //call remote api
-                            await meetSrv.PushEndOfMeetingAsync(_room.BotName, roomId, userId);
+                            await meetSrv.PushEndOfMeetingAsync(room.BotName, roomId, userId);
                         }
                         else
                         {
-                            await meetSrv.InitingAnswerAsync(nextAnswer);
+                            //nextAnswer.Meeting.Room.RoomId
+                            await _connectorClient.PushRemoteChatService(room.BotName, 
+                                $"{room.RoomId}-{nextAnswer.UserId}", nextAnswer.UserName);
                         }
                         transaction.Commit();
                     }
