@@ -18,12 +18,14 @@ namespace ChatFirst.Hack.Standups.Controllers
         private readonly IMetingAnswersRepository _metingAnswersRepository = new MetingAnswersRepository();
 
         [Route("api/skip")]
+        [HttpGet]
         public Task<IHttpActionResult> Skip(string id)
         {
             throw new NotImplementedException();
         }
 
         [Route("api/dismiss")]
+        [HttpGet]
         public Task<IHttpActionResult> Dismiss(string id)
         {
             throw new NotImplementedException();
