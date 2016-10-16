@@ -1,23 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Data.Entity;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using ChatFirst.Hack.Standups.Extensions;
+using ChatFirst.Hack.Standups.Models;
+using ChatFirst.Hack.Standups.Services;
 
 namespace ChatFirst.Hack.Standups.Controllers
 {
-    using System.Diagnostics;
-    using Extensions;
-    using Models;
-    using System.Data.Entity;
-    using Services;
-
     public class AnswerbackController : ApiController
     {
-        private IConnectorClient _connectorClient = new ConnectorClient();
-        private IMetingAnswersRepository _metingAnswersRepository = new MetingAnswersRepository();
+        private readonly IConnectorClient _connectorClient = new ConnectorClient();
+        private readonly IMetingAnswersRepository _metingAnswersRepository = new MetingAnswersRepository();
+
+        [Route("api/skip")]
+        public Task<IHttpActionResult> Skip(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Route("api/dismiss")]
+        public Task<IHttpActionResult> Dismiss(string id)
+        {
+            throw new NotImplementedException();
+        }
+
 
         [Route("api/answerback/{qnum}")]
         public async Task<IHttpActionResult> Get(int qnum, string id, string msg)
@@ -67,7 +78,7 @@ namespace ChatFirst.Hack.Standups.Controllers
                         else
                         {
                             //nextAnswer.Meeting.Room.RoomId
-                            await _connectorClient.PushRemoteChatService(room.BotName, 
+                            await _connectorClient.PushRemoteChatService(room.BotName,
                                 $"{room.RoomId}-{nextAnswer.UserId}", nextAnswer.UserName);
                         }
                         transaction.Commit();
@@ -84,9 +95,9 @@ namespace ChatFirst.Hack.Standups.Controllers
                                 Count = 1,
                                 ForcedState = string.Empty,
                                 //todo: set friendly messages
-                                Messages = new List<string> { e.Message }
+                                Messages = new List<string> {e.Message}
                             }
-                        ));
+                            ));
                     }
                 }
             }
@@ -96,15 +107,16 @@ namespace ChatFirst.Hack.Standups.Controllers
 
         private static ExternalMessage CreateExternalMessage()
         {
-            return new ExternalMessage() { Count = 0, Messages = new List<string>()};
+            return new ExternalMessage {Count = 0, Messages = new List<string>()};
         }
 
-        private async Task<bool> UpdateAnswer(int qnum, string msg, HackDbContext db, Meeting meet, string userId, string roomId)
+        private async Task<bool> UpdateAnswer(int qnum, string msg, HackDbContext db, Meeting meet, string userId,
+            string roomId)
         {
             var answer = await db.Answers.FirstOrDefaultAsync(a => a.MeetingId == meet.Id && a.UserId == userId);
             if (answer == null)
             {
-                throw new Exception($"userId={userId} not found in roomId={roomId}");                
+                throw new Exception($"userId={userId} not found in roomId={roomId}");
             }
             switch (qnum)
             {
@@ -118,7 +130,7 @@ namespace ChatFirst.Hack.Standups.Controllers
                     answer.Ans3 = msg;
                     break;
                 default:
-                        throw new ArgumentException($"invalid question number={qnum}");
+                    throw new ArgumentException($"invalid question number={qnum}");
             }
             db.Entry(answer).State = EntityState.Modified;
             await db.SaveChangesAsync();
