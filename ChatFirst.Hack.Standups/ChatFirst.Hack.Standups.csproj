@@ -132,6 +132,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Controllers\AnswerbackController.cs" />
     <Compile Include="Controllers\MeetingsController.cs" />
+    <Compile Include="Controllers\ResultController.cs" />
     <Compile Include="Controllers\RoomsController.cs" />
     <Compile Include="Extensions\ExceptionsEx.cs" />
     <Compile Include="Extensions\ViewModels.cs" />

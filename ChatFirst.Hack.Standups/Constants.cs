@@ -16,5 +16,8 @@ namespace ChatFirst.Hack.Standups
         public const string TemplateMessage3 = "templateMessage3";
         public const string ForcedState = "ForcedState";
         public static string QuitMessage = "quitMessage";
+        public const string BotQuestion1 = "BotQuestion1";
+        public const string BotQuestion2 = "BotQuestion2";
+        public const string BotQuestion3 = "BotQuestion3";
     }
 }

@@ -11,5 +11,6 @@ namespace ChatFirst.Hack.Standups.Services
         Task<Meeting> SaveMeeting(Room room, IEnumerable<ChatRoomUser> users);
         Task<IEnumerable<Meeting>> GetOpenMeetingsByRoomId(long roomId);
         Task<Meeting> UpdateMeeting(long meetId, Meeting meet);
+        Task<IEnumerable<Answer>> GetLastMeetingAnswersByRoomId(long roomId);
     }
 }

@@ -91,5 +91,19 @@ namespace ChatFirst.Hack.Standups.Services
                 return await db.Meetings.Where(m => m.RoomId == roomId && m.DateEnd == null).ToListAsync();
             }
         }
+
+        public async Task<IEnumerable<Answer>> GetLastMeetingAnswersByRoomId(long roomId)
+        {
+            using (var db = new HackDbContext(ConfigService.Get(Constants.DbConnectionKey)))
+            {
+                var lastMeet = await db.Meetings
+                                .Where(m => m.RoomId == roomId && m.DateEnd != null)
+                                .OrderByDescending(m => m.Id)
+                                .FirstOrDefaultAsync();
+                if (lastMeet == null)
+                    return new List<Answer>();
+                return await db.Answers.Where(a => a.MeetingId == lastMeet.Id).ToListAsync();
+            }
+        }
     }
 }
