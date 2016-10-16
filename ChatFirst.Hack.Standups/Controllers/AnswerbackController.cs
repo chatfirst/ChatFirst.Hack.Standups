@@ -43,7 +43,7 @@ namespace ChatFirst.Hack.Standups.Controllers
             {
                 await _meetingService.QuitMeetingAsync(roomId);
                 Trace.TraceInformation("[AnswerbackController.Dismiss] OK");
-                return Ok(Helpers.CreateExternalMessage(ConfigService.Get(Constants.QuitMessage)));
+                return Ok(Helpers.CreateExternalMessage());
             }
             catch(Exception ex)
             {

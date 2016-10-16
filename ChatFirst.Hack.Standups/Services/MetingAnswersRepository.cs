@@ -53,10 +53,7 @@ namespace ChatFirst.Hack.Standups.Services
 
                 if (room == null)
                     throw new ApplicationException("not found roomId=" + roomId);
-                var meetExist =
-                    await db.Meetings.FirstOrDefaultAsync(m => m.RoomId == roomId && m.DateEnd == null);
-                if (meetExist != null)
-                    throw new ApplicationException("meet not exist in roomId=" + roomId);
+
                 return room;
             }
         }
