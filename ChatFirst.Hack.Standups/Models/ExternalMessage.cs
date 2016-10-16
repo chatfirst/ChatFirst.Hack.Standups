@@ -5,7 +5,7 @@ using System.Web;
 
 namespace ChatFirst.Hack.Standups.Models
 {
-    public class PushAnswerDataStruct
+    public class ExternalMessage
     {
         public int Count { get; set; }
         public List<string> Messages { get; set; }

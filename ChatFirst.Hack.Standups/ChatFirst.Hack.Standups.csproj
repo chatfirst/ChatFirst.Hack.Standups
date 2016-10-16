@@ -145,7 +145,7 @@
     <Compile Include="Models\ChatRoomUser.cs" />
     <Compile Include="Models\HackDbContext.cs" />
     <Compile Include="Models\Meeting.cs" />
-    <Compile Include="Models\PushAnswerDataStruct.cs" />
+    <Compile Include="Models\ExternalMessage.cs" />
     <Compile Include="Models\Room.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\Contract\IAnswerRepository.cs" />
@@ -159,10 +159,16 @@
     <Compile Include="Repository\Implementations\RoomRepository.cs" />
     <Compile Include="Services\ChatRoomUserService.cs" />
     <Compile Include="Services\ConfigService.cs" />
+    <Compile Include="Services\ConnectorClient.cs" />
     <Compile Include="Services\DalService.cs" />
     <Compile Include="Services\IChatRoomUserService.cs" />
+    <Compile Include="Services\IConnectorClient.cs" />
     <Compile Include="Services\IMeetingService.cs" />
+    <Compile Include="Services\IMetingAnswersRepository.cs" />
+    <Compile Include="Services\IRoomRepository.cs" />
     <Compile Include="Services\MeetingService.cs" />
+    <Compile Include="Services\MetingAnswersRepository.cs" />
+    <Compile Include="Services\RoomRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config" />

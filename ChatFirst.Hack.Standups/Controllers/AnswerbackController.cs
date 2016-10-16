@@ -17,6 +17,7 @@ namespace ChatFirst.Hack.Standups.Controllers
     public class AnswerbackController : ApiController
     {
         private IConnectorClient _connectorClient = new ConnectorClient();
+        private IMetingAnswersRepository _metingAnswersRepository = new MetingAnswersRepository();
 
         [Route("api/answerback/{qnum}")]
         public async Task<IHttpActionResult> Get(int qnum, string id, string msg)
@@ -42,35 +43,16 @@ namespace ChatFirst.Hack.Standups.Controllers
                         var meet = await db.Meetings.FirstOrDefaultAsync(m => m.RoomId == room.Id && m.DateEnd == null);
                         if (meet == null)
                             return BadRequest($"open meeting not found in roomId={roomId}");
-                        var answer = await db.Answers.FirstOrDefaultAsync(a => a.MeetingId == meet.Id && a.UserId == userId);
-                        if (answer == null)
-                            return BadRequest($"userId={userId} not found in roomId={roomId}");
-                        switch (qnum)
+
+                        var isNotComplete = await UpdateAnswer(qnum, msg, db, meet, userId, roomId);
+                        if (isNotComplete)
                         {
-                            case 1:
-                                answer.Ans1 = msg;
-                                break;
-                            case 2:
-                                answer.Ans2 = msg;
-                                break;
-                            case 3:
-                                answer.Ans3 = msg;
-                                break;
-                            default:
-                                return BadRequest($"invalid question number={qnum}");
+                            transaction.Commit();
+                            return Ok(CreateExternalMessage()); //exist not answered
                         }
-                        db.Entry(answer).State = EntityState.Modified;
-                        await db.SaveChangesAsync();
 
-
-                        if (string.IsNullOrEmpty(answer.Ans1)
-                            || string.IsNullOrEmpty(answer.Ans2)
-                            || string.IsNullOrEmpty(answer.Ans3))
-                            //exist not answered
-                            return Ok();
                         //init next push or end meeting
-                        var meetSrv = new MeetingService();
-                        var nextAnswer = await meetSrv.GetNextMeetingPushAsync(meet.Id);
+                        var nextAnswer = await _metingAnswersRepository.GetNextMeetingPushAsync(meet.Id);
                         if (nextAnswer == null)
                         {
                             // end meeting
@@ -78,8 +60,9 @@ namespace ChatFirst.Hack.Standups.Controllers
                             meet.DateEnd = DateTime.Now;
                             db.Entry(meet).State = EntityState.Modified;
                             await db.SaveChangesAsync();
+
                             //call remote api
-                            await meetSrv.PushEndOfMeetingAsync(room.BotName, roomId, userId);
+                            await _connectorClient.PushEndOfMeetingAsync(room.BotName, $"{room.RoomId}-{userId}");
                         }
                         else
                         {
@@ -96,7 +79,7 @@ namespace ChatFirst.Hack.Standups.Controllers
                         Trace.TraceError(e.ToString());
                         return ResponseMessage(Request.CreateResponse(
                             HttpStatusCode.InternalServerError,
-                            new PushAnswerDataStruct
+                            new ExternalMessage
                             {
                                 Count = 1,
                                 ForcedState = string.Empty,
@@ -109,6 +92,40 @@ namespace ChatFirst.Hack.Standups.Controllers
             }
 
             return Ok();
+        }
+
+        private static ExternalMessage CreateExternalMessage()
+        {
+            return new ExternalMessage() { Count = 0, Messages = new List<string>()};
+        }
+
+        private async Task<bool> UpdateAnswer(int qnum, string msg, HackDbContext db, Meeting meet, string userId, string roomId)
+        {
+            var answer = await db.Answers.FirstOrDefaultAsync(a => a.MeetingId == meet.Id && a.UserId == userId);
+            if (answer == null)
+            {
+                throw new Exception($"userId={userId} not found in roomId={roomId}");                
+            }
+            switch (qnum)
+            {
+                case 1:
+                    answer.Ans1 = msg;
+                    break;
+                case 2:
+                    answer.Ans2 = msg;
+                    break;
+                case 3:
+                    answer.Ans3 = msg;
+                    break;
+                default:
+                        throw new ArgumentException($"invalid question number={qnum}");
+            }
+            db.Entry(answer).State = EntityState.Modified;
+            await db.SaveChangesAsync();
+
+            return string.IsNullOrEmpty(answer.Ans1)
+                   || string.IsNullOrEmpty(answer.Ans2)
+                   || string.IsNullOrEmpty(answer.Ans3);
         }
     }
 }
