@@ -5,5 +5,7 @@ namespace ChatFirst.Hack.Standups.Services
     public interface IMeetingService
     {
         Task StartMeetingAsync(long roomId);
+
+        Task DismissMeetingAsync(string sparkRoomId);
     }
 }

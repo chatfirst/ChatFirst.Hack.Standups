@@ -1,5 +1,7 @@
+using System;
 using System.Threading.Tasks;
 using ChatFirst.Hack.Standups.Models;
+using System.Data.Entity;
 
 namespace ChatFirst.Hack.Standups.Services
 {
@@ -20,6 +22,14 @@ namespace ChatFirst.Hack.Standups.Services
             {
                 var room = await db.Rooms.FindAsync(roomId);
                 return room == null ? string.Empty : room.BotName;
+            }
+        }
+
+        public async Task<Room> GetRoomBySparkRoomID(string sparkRoomId)
+        {
+            using (var db = new HackDbContext())
+            {
+                return await db.Rooms.FirstOrDefaultAsync(r => r.RoomId == sparkRoomId);
             }
         }
     }

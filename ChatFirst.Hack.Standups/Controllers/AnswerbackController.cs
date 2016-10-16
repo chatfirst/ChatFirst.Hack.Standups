@@ -16,6 +16,7 @@ namespace ChatFirst.Hack.Standups.Controllers
     {
         private readonly IConnectorClient _connectorClient = new ConnectorClient();
         private readonly IMetingAnswersRepository _metingAnswersRepository = new MetingAnswersRepository();
+        private readonly IMeetingService _meetingService = new MeetingService();
 
         [Route("api/skip")]
         [HttpGet]
@@ -26,9 +27,40 @@ namespace ChatFirst.Hack.Standups.Controllers
 
         [Route("api/dismiss")]
         [HttpGet]
-        public Task<IHttpActionResult> Dismiss(string id)
+        public async Task<IHttpActionResult> Dismiss(string id)
         {
-            throw new NotImplementedException();
+            Trace.TraceInformation("[AnswerbackController.Dismiss] id=" + id);
+            //try set DateEnd for meet
+            if (string.IsNullOrEmpty(id))
+                return BadRequest();
+            var s = id.Split('-');
+            if (s.Length != 2)
+                return BadRequest();
+
+            var roomId = s[0];
+            var userId = s[1];
+
+            try
+            {
+                await _meetingService.DismissMeetingAsync(roomId);
+                Trace.TraceInformation("[AnswerbackController.Dismiss] OK");
+                return Ok(CreateExternalMessage());
+            }
+            catch(Exception ex)
+            {
+                var e = ex.GetInnerBottomException();
+                Trace.TraceError(e.ToString());
+                return ResponseMessage(Request.CreateResponse(
+                    HttpStatusCode.InternalServerError,
+                    new ExternalMessage
+                    {
+                        Count = 1,
+                        ForcedState = string.Empty,
+                                //todo: set friendly messages
+                                Messages = new List<string> { e.Message }
+                    }
+                ));
+            }            
         }
 
 

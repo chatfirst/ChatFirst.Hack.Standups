@@ -30,6 +30,16 @@ namespace ChatFirst.Hack.Standups.Tests
                 Console.WriteLine($"saved {room.Id}");
                 return Task.FromResult(Builder<Meeting>.CreateNew().With(i => i.RoomId = room.Id).Build());
             }
+
+            public Task<IEnumerable<Meeting>> GetOpenMeetingsByRoomId(long roomId)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task<Meeting> UpdateMeeting(long meetId, Meeting meet)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         [Test]
