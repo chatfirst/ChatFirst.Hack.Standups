@@ -9,5 +9,8 @@ namespace ChatFirst.Hack.Standups.Services
         Task<string> GetSparkRoomId(long roomId);
         Task<Room> GetRoomBySparkRoomID(string sparkRoomId);
         Task<string> GetBotName(long roomId);
+
+        Task<Room> AddNewRoom(Room room);
+        Task<bool> IsExistRoomSparkId(string sparkRoomId);
     }
 }

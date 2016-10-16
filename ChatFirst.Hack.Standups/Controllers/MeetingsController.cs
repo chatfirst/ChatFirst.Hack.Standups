@@ -33,7 +33,15 @@ namespace ChatFirst.Hack.Standups.Controllers
                 Trace.TraceInformation("[MeetingsController.GetStart] roomId=" + roomId);
                 var room = await _roomRepo.GetRoomBySparkRoomID(roomId);
                 if (room == null)
-                    throw new ApplicationException("Can't start meeting for this room. Room is not found!");
+                {
+                    //todo: create new Room with hardcoded botName
+                    var newRoom = new Room
+                    {
+                        BotName = ConfigService.Get(Constants.BatNameHardcoded),
+                        RoomId = roomId                        
+                    };
+                    room = await _roomRepo.AddNewRoom(newRoom);
+                }
                 await _meetingService.StartMeetingAsync(room.Id);
                 return Ok(Helpers.CreateExternalMessage());
             }

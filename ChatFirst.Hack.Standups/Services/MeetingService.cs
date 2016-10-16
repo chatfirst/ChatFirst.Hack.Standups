@@ -6,6 +6,7 @@ using ChatFirst.Hack.Standups.Models;
 using RestSharp;
 using RestSharp.Authenticators;
 using System.Linq;
+using System.Data.Entity;
 
 namespace ChatFirst.Hack.Standups.Services
 {
@@ -68,6 +69,14 @@ namespace ChatFirst.Hack.Standups.Services
             {
                 meet.DateEnd = DateTime.Now;
                 await _metingAnswersRepository.UpdateMeeting(meet.Id, meet);
+            }
+        }
+
+        public async Task<IEnumerable<Meeting>> GetMeetingsByRoomId(long roomId)
+        {
+            using (var db = new HackDbContext())
+            {
+                return await db.Meetings.Where(m => m.RoomId == roomId).ToListAsync();
             }
         }
     }

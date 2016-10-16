@@ -12,9 +12,14 @@ using ChatFirst.Hack.Standups.Models;
 
 namespace ChatFirst.Hack.Standups.Controllers
 {
+    using Services;
+    using System.Threading.Tasks;
     public class RoomsController : ApiController
     {
         private HackDbContext db = new HackDbContext();
+        private readonly IMeetingService _meetingService = new MeetingService();
+        private readonly IRoomRepository _roomRepo = new RoomRepository();
+        private readonly IMetingAnswersRepository _metingAnswersRepository = new MetingAnswersRepository();
 
         // GET: api/Rooms
         public IQueryable<Room> GetRooms()
@@ -87,7 +92,7 @@ namespace ChatFirst.Hack.Standups.Controllers
 
         // DELETE: api/Rooms/5
         [ResponseType(typeof(Room))]
-        public IHttpActionResult DeleteRoom(long id)
+        public async Task<IHttpActionResult> DeleteRoom(long id)
         {
             Room room = db.Rooms.Find(id);
             if (room == null)
@@ -95,8 +100,19 @@ namespace ChatFirst.Hack.Standups.Controllers
                 return NotFound();
             }
 
+            var meets = await _meetingService.GetMeetingsByRoomId(room.Id);
+            
+            foreach(var meet in meets)
+            {
+                await _metingAnswersRepository.DeleteAnswersInMiting(meet.Id);
+            }
+
+            var ids = meets.Select(m => m.Id).ToList();
+            var toDelMeets = await db.Meetings.Where(m => ids.Contains(m.Id)).ToListAsync();
+            db.Meetings.RemoveRange(toDelMeets);
+            await db.SaveChangesAsync();
             db.Rooms.Remove(room);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             return Ok(room);
         }

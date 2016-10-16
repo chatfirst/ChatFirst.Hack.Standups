@@ -105,5 +105,15 @@ namespace ChatFirst.Hack.Standups.Services
                 return await db.Answers.Where(a => a.MeetingId == lastMeet.Id).ToListAsync();
             }
         }
+
+        public async Task<int> DeleteAnswersInMiting(long meetId)
+        {
+            using (var db = new HackDbContext(ConfigService.Get(Constants.DbConnectionKey)))
+            {
+                var anss = await db.Answers.Where(a => a.MeetingId == meetId).ToListAsync();
+                db.Answers.RemoveRange(anss);
+                return await db.SaveChangesAsync();
+            }
+        }
     }
 }

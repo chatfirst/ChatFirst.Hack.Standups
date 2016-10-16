@@ -32,5 +32,25 @@ namespace ChatFirst.Hack.Standups.Services
                 return await db.Rooms.FirstOrDefaultAsync(r => r.RoomId == sparkRoomId);
             }
         }
+
+        public async Task<Room> AddNewRoom(Room room)
+        {
+            if (room == null)
+                return null;
+            using (var db = new HackDbContext())
+            {
+                var r = db.Rooms.Add(room);
+                await db.SaveChangesAsync();
+                return r;
+            }
+        }
+
+        public async Task<bool> IsExistRoomSparkId(string sparkRoomId)
+        {
+            using (var db = new HackDbContext())
+            {
+                return await db.Rooms.AnyAsync(r => r.RoomId == sparkRoomId);
+            }
+        }
     }
 }
