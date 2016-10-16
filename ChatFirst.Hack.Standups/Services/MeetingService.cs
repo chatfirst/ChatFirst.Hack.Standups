@@ -55,7 +55,7 @@ namespace ChatFirst.Hack.Standups.Services
             return meet.Id;
         }
 
-        public async Task DismissMeetingAsync(string sparkRoomId)
+        public async Task QuitMeetingAsync(string sparkRoomId)
         {
             var room = await _roomRepository.GetRoomBySparkRoomID(sparkRoomId);
             if (room == null)

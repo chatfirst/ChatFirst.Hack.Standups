@@ -1,31 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Linq;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
-using System.Web.Http;
-using System.Web.Http.Description;
-using ChatFirst.Hack.Standups.Models;
 using System.Threading.Tasks;
+using System.Web.Http;
+using ChatFirst.Hack.Standups.Extensions;
+using ChatFirst.Hack.Standups.Models;
+using ChatFirst.Hack.Standups.Services;
 
 namespace ChatFirst.Hack.Standups.Controllers
 {
-    using Services;
-    using Extensions;
-    using System.Diagnostics;
-
     public class MeetingsController : ApiController
     {
-        private HackDbContext db = new HackDbContext();
-        private readonly IRoomRepository _roomRepo = new RoomRepository();
         private readonly IMeetingService _meetingService = new MeetingService();
+        private readonly IRoomRepository _roomRepo = new RoomRepository();
+        private HackDbContext db = new HackDbContext();
 
-        [Route("api/start")]
+        [Route("api/meetings/start")]
         [HttpGet]
-        public async Task<IHttpActionResult> GetStart(string id)
+        public async Task<IHttpActionResult> Start(string id)
         {
             if (string.IsNullOrEmpty(id))
                 return BadRequest();
@@ -34,7 +27,6 @@ namespace ChatFirst.Hack.Standups.Controllers
                 return BadRequest();
 
             var roomId = s[0];
-            var userId = s[1];
 
             try
             {
@@ -43,27 +35,20 @@ namespace ChatFirst.Hack.Standups.Controllers
                 if (room == null)
                     throw new ApplicationException("Can't start meeting for this room. Room is not found!");
                 await _meetingService.StartMeetingAsync(room.Id);
-                return Ok(new ExternalMessage { Count = 0, Messages = new List<string>() });
+                return Ok(Helpers.CreateExternalMessage());
             }
             catch (Exception ex)
             {
                 var e = ex.GetInnerBottomException();
                 Trace.TraceError(e.ToString());
                 return ResponseMessage(Request.CreateResponse(
-                    HttpStatusCode.InternalServerError,
-                    new ExternalMessage
-                    {
-                        Count = 1,
-                        ForcedState = string.Empty,
-                        //todo: set friendly messages
-                        Messages = new List<string> { e.Message }
-                    }
-                ));
+                    HttpStatusCode.InternalServerError, Helpers.CreateExternalMessage(e.Message)));
             }
         }
 
-        // GET: api/Meetings/1
-        public async Task<IHttpActionResult> GetMeetings(long roomId)
+        [Route("api/meetings/manualstart")]
+        [HttpGet]
+        public async Task<IHttpActionResult> ManualStart(long roomId)
         {
             try
             {
@@ -77,99 +62,6 @@ namespace ChatFirst.Hack.Standups.Controllers
                 Trace.TraceError(ex.GetInnerBottomException().ToString());
                 return Ok(ex.GetInnerBottomException().Message);
             }
-        }
-
-        //// GET: api/Meetings/5
-        //[ResponseType(typeof(Meeting))]
-        //public IHttpActionResult GetMeeting(long id)
-        //{
-        //    Meeting meeting = db.Meetings.Find(id);
-        //    if (meeting == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return Ok(meeting);
-        //}
-
-        //// PUT: api/Meetings/5
-        //[ResponseType(typeof(void))]
-        //public IHttpActionResult PutMeeting(long id, Meeting meeting)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    if (id != meeting.Id)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    db.Entry(meeting).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        db.SaveChanges();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!MeetingExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return StatusCode(HttpStatusCode.NoContent);
-        //}
-
-        //// POST: api/Meetings
-        //[ResponseType(typeof(Meeting))]
-        //public IHttpActionResult PostMeeting(Meeting meeting)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    db.Meetings.Add(meeting);
-        //    db.SaveChanges();
-
-        //    return CreatedAtRoute("DefaultApi", new { id = meeting.Id }, meeting);
-        //}
-
-        //// DELETE: api/Meetings/5
-        //[ResponseType(typeof(Meeting))]
-        //public IHttpActionResult DeleteMeeting(long id)
-        //{
-        //    Meeting meeting = db.Meetings.Find(id);
-        //    if (meeting == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    db.Meetings.Remove(meeting);
-        //    db.SaveChanges();
-
-        //    return Ok(meeting);
-        //}
-
-        //protected override void Dispose(bool disposing)
-        //{
-        //    if (disposing)
-        //    {
-        //        db.Dispose();
-        //    }
-        //    base.Dispose(disposing);
-        //}
-
-        //private bool MeetingExists(long id)
-        //{
-        //    return db.Meetings.Count(e => e.Id == id) > 0;
-        //}
+        }        
     }
 }

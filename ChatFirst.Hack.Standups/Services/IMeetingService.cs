@@ -6,6 +6,6 @@ namespace ChatFirst.Hack.Standups.Services
     {
         Task StartMeetingAsync(long roomId);
 
-        Task DismissMeetingAsync(string sparkRoomId);
+        Task QuitMeetingAsync(string sparkRoomId);
     }
 }

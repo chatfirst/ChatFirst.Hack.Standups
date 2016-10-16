@@ -25,11 +25,11 @@ namespace ChatFirst.Hack.Standups.Controllers
             throw new NotImplementedException();
         }
 
-        [Route("api/dismiss")]
+        [Route("api/quit")]
         [HttpGet]
-        public async Task<IHttpActionResult> Dismiss(string id)
+        public async Task<IHttpActionResult> Quit(string id)
         {
-            Trace.TraceInformation("[AnswerbackController.Dismiss] id=" + id);
+            Trace.TraceInformation("[AnswerbackController.Quit] id=" + id);
             //try set DateEnd for meet
             if (string.IsNullOrEmpty(id))
                 return BadRequest();
@@ -38,28 +38,19 @@ namespace ChatFirst.Hack.Standups.Controllers
                 return BadRequest();
 
             var roomId = s[0];
-            var userId = s[1];
 
             try
             {
-                await _meetingService.DismissMeetingAsync(roomId);
+                await _meetingService.QuitMeetingAsync(roomId);
                 Trace.TraceInformation("[AnswerbackController.Dismiss] OK");
-                return Ok(CreateExternalMessage());
+                return Ok(Helpers.CreateExternalMessage(ConfigService.Get(Constants.QuitMessage)));
             }
             catch(Exception ex)
             {
                 var e = ex.GetInnerBottomException();
                 Trace.TraceError(e.ToString());
                 return ResponseMessage(Request.CreateResponse(
-                    HttpStatusCode.InternalServerError,
-                    new ExternalMessage
-                    {
-                        Count = 1,
-                        ForcedState = string.Empty,
-                                //todo: set friendly messages
-                                Messages = new List<string> { e.Message }
-                    }
-                ));
+                    HttpStatusCode.InternalServerError, Helpers.CreateExternalMessage(e.Message)));
             }            
         }
 
@@ -95,7 +86,7 @@ namespace ChatFirst.Hack.Standups.Controllers
                         if (isNotComplete)
                         {
                             transaction.Commit();
-                            return Ok(CreateExternalMessage()); //exist not answered
+                            return Ok(Helpers.CreateExternalMessage()); //exist not answered
                         }
 
                         //init next push or end meeting
@@ -125,26 +116,15 @@ namespace ChatFirst.Hack.Standups.Controllers
                         var e = ex.GetInnerBottomException();
                         Trace.TraceError(e.ToString());
                         return ResponseMessage(Request.CreateResponse(
-                            HttpStatusCode.InternalServerError,
-                            new ExternalMessage
-                            {
-                                Count = 1,
-                                ForcedState = string.Empty,
-                                //todo: set friendly messages
-                                Messages = new List<string> {e.ToString()}
-                            }
-                            ));
+                            HttpStatusCode.InternalServerError, Helpers.CreateExternalMessage(e.Message)));
                     }
                 }
             }
 
-            return Ok(CreateExternalMessage());
+            return Ok(Helpers.CreateExternalMessage());
         }
 
-        private static ExternalMessage CreateExternalMessage()
-        {
-            return new ExternalMessage {Count = 0, Messages = new List<string>()};
-        }
+
 
         private async Task<bool> UpdateAnswer(int qnum, string msg, HackDbContext db, Meeting meet, string userId,
             string roomId)
