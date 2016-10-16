@@ -35,6 +35,8 @@ namespace ChatFirst.Hack.Standups.Controllers
         [Route("api/answerback/{qnum}")]
         public async Task<IHttpActionResult> Get(int qnum, string id, string msg)
         {
+            Trace.TraceInformation($"Incoming answer from {id}, {qnum}: {msg}");
+
             if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(msg))
                 return BadRequest();
             var s = id.Split('-');
@@ -97,14 +99,14 @@ namespace ChatFirst.Hack.Standups.Controllers
                                 Count = 1,
                                 ForcedState = string.Empty,
                                 //todo: set friendly messages
-                                Messages = new List<string> {e.Message}
+                                Messages = new List<string> {e.ToString()}
                             }
                             ));
                     }
                 }
             }
 
-            return Ok();
+            return Ok(CreateExternalMessage());
         }
 
         private static ExternalMessage CreateExternalMessage()
